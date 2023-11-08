@@ -1,14 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import CourseCard from "../Components/CourseCard";
 
 const CoursePage = () => {
   const [searchInput, setSearchInput] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [filteredCourse, setFilteredCourse] = useState([]);
 
-  const handleSearch = (e, searchInput) => {
-    e.preventDefault();
+  const fetchCourse = () => {
+    fetch("https://api.npoint.io/ffe04707e10bc4736d57")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => setCourses(data.courses));
   };
+
+  useEffect(() => {
+    fetchCourse();
+  }, []);
+
+  const handleSearch = () => {
+    const filtered = courses.filter((course) =>
+      course.name.toLowerCase().includes(searchInput.toLowerCase())
+    );
+    setFilteredCourse(filtered);
+  };
+
+  const handleChange = (e) => {
+    setSearchInput(e.target.value);
+    handleSearch();
+  };
+
   return (
     <Container>
       <InputGrp onSubmit={handleSearch}>
@@ -19,18 +42,33 @@ const CoursePage = () => {
         <Input
           placeholder="Search Courses"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={handleChange}
         />
       </InputGrp>
       <CoursesContainer>
         <h2>Available Courses</h2>
         <CourseGrp>
-          <CourseCard title="Ultimate Javascript" description="" />
-          <CourseCard title="Ultimate Javascript" description="" />
-          <CourseCard title="Ultimate Javascript" description="" />
-          <CourseCard title="Ultimate Javascript" description="" />
-          <CourseCard title="Ultimate Javascript" description="" />
-          <CourseCard title="Ultimate Javascript" description="" />
+          {searchInput === ""
+            ? courses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  title={course.name}
+                  thumbnail={course.thumbnail}
+                  expertise={course.expertise}
+                  duration={course.duration}
+                  amount={course.price}
+                />
+              ))
+            : filteredCourse.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  title={course.name}
+                  thumbnail={course.thumbnail}
+                  expertise={course.expertise}
+                  duration={course.duration}
+                  amount={course.price}
+                />
+              ))}
         </CourseGrp>
       </CoursesContainer>
     </Container>
@@ -46,7 +84,7 @@ const Container = styled.div`
   align-items: center;
   padding: 20px 50px 80px 50px;
 `;
-const InputGrp = styled.form`
+const InputGrp = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
