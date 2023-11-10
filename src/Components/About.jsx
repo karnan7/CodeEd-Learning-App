@@ -3,6 +3,7 @@ import styled from "styled-components";
 import learn from "../assets/learn.png";
 import mentor from "../assets/mentor.png";
 import job from "../assets/job.png";
+import { Link } from "react-router-dom";
 
 const About = () => {
   return (
@@ -39,6 +40,9 @@ const About = () => {
           </div>
         </JobCard>
       </Wrap>
+      <Link to="/courses">
+        <button>Course</button>
+      </Link>
     </Container>
   );
 };

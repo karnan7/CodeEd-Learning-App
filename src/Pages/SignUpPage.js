@@ -1,36 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import logImage from "../assets/login.jpg";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserLoginDetails } from "../features/user/userSlice";
 
 const SignUpPage = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
+  const handleEmailSignUp = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        setUser(userCredentials.user);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const setUser = (user) => {
+    dispatch(
+      setUserLoginDetails({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+      })
+    );
+  };
   return (
     <Container>
       <CharImage src={logImage} />
       <Log>
         <h1>Sign Up</h1>
-        <Providers>
-          <Google>
-            <GButton>
-              <FcGoogle size="20px" />
-              <span>Sign up with Google</span>
-            </GButton>
-          </Google>
-          <Apple>
-            <AButton>
-              <FaApple size="20px" color="#999999" />
-              <span>Sign up with Apple</span>
-            </AButton>
-          </Apple>
-        </Providers>
+
         <LoginForm>
-          <InputGrp placeholder="Name" />
-          <InputGrp placeholder="Email" />
-          <InputGrp placeholder="Password" />
+          <InputGrp
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <InputGrp
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <InputGrp
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </LoginForm>
-        <SubmitButton>Sign Up</SubmitButton>
+        <SubmitButton onClick={handleEmailSignUp}>Sign Up</SubmitButton>
         <SwitchLink>
           Already have an account ?{" "}
           <Link to="/login" style={{ color: "#346BD4" }}>

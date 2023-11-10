@@ -2,18 +2,29 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import CourseCard from "../Components/CourseCard";
+import { useDispatch, useSelector } from "react-redux";
+import { setCourseData } from "../features/course/courseSlice";
+import { Link } from "react-router-dom";
 
 const CoursePage = () => {
+  const dispatch = useDispatch();
   const [searchInput, setSearchInput] = useState("");
-  const [courses, setCourses] = useState([]);
   const [filteredCourse, setFilteredCourse] = useState([]);
+
+  const courseList = useSelector((state) => state.course.courses);
 
   const fetchCourse = () => {
     fetch("https://api.npoint.io/ffe04707e10bc4736d57")
       .then((response) => {
         return response.json();
       })
-      .then((data) => setCourses(data.courses));
+      .then((data) => {
+        dispatch(
+          setCourseData({
+            courses: data.courses,
+          })
+        );
+      });
   };
 
   useEffect(() => {
@@ -21,7 +32,7 @@ const CoursePage = () => {
   }, []);
 
   const handleSearch = () => {
-    const filtered = courses.filter((course) =>
+    const filtered = courseList.filter((course) =>
       course.name.toLowerCase().includes(searchInput.toLowerCase())
     );
     setFilteredCourse(filtered);
@@ -49,15 +60,17 @@ const CoursePage = () => {
         <h2>Available Courses</h2>
         <CourseGrp>
           {searchInput === ""
-            ? courses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  title={course.name}
-                  thumbnail={course.thumbnail}
-                  expertise={course.expertise}
-                  duration={course.duration}
-                  amount={course.price}
-                />
+            ? courseList.map((course) => (
+                <Link to={`/details/` + course.id}>
+                  <CourseCard
+                    key={course.id}
+                    title={course.name}
+                    thumbnail={course.thumbnail}
+                    expertise={course.expertise}
+                    duration={course.duration}
+                    amount={course.price}
+                  />
+                </Link>
               ))
             : filteredCourse.map((course) => (
                 <CourseCard

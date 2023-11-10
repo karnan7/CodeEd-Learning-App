@@ -1,18 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import logImage from "../assets/login.jpg";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithPopup,
+} from "firebase/auth";
+import {
+  selectUserEmail,
+  selectUserName,
+  setUserLoginDetails,
+} from "../features/user/userSlice";
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const userName = useSelector(selectUserName);
+  const userEmail = useSelector(selectUserEmail);
+
+  const handleGoogleSignIn = () => {
+    const googleAuthProvider = new GoogleAuthProvider();
+    signInWithPopup(auth, googleAuthProvider)
+      .then((userCredentials) => {
+        setUser(userCredentials.user);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleEmailSignIn = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        setUser(userCredentials.user);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const setUser = (user) => {
+    dispatch(
+      setUserLoginDetails({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+      })
+    );
+  };
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        navigate("/home");
+      }
+    });
+  }, [userEmail]);
+
   return (
     <Container>
       <CharImage src={logImage} />
       <Log>
         <h1>Log In</h1>
         <Providers>
-          <Google>
+          <Google onClick={handleGoogleSignIn}>
             <GButton>
               <FcGoogle size="20px" />
               <span>Sign in with Google</span>
@@ -26,10 +83,20 @@ const LoginPage = () => {
           </Apple>
         </Providers>
         <LoginForm>
-          <InputGrp placeholder="Email" />
-          <InputGrp placeholder="Password" />
+          <InputGrp
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <InputGrp
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </LoginForm>
-        <SubmitButton>Log In</SubmitButton>
+        <SubmitButton onClick={handleEmailSignIn}>Log In</SubmitButton>
         <SwitchLink>
           Don't have an account ?{" "}
           <Link to="/signup" style={{ color: "#346BD4" }}>
