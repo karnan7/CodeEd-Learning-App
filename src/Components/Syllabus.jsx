@@ -3,23 +3,10 @@ import styled from "styled-components";
 import { AiFillCaretDown, AiFillCaretUp } from "react-icons/ai";
 import { PiVideo } from "react-icons/pi";
 
-const Syllabus = () => {
+const Syllabus = ({content}) => {
   const [open, setOpen] = useState(false);
 
-  const item = [
-    {
-      week: 1,
-      content: "Introduction",
-    },
-    {
-      week: 2,
-      content: "Advanced",
-    },
-    {
-      week: 3,
-      content: "Experimental",
-    },
-  ];
+
   return (
     <div>
       <div onClick={() => setOpen(!open)}>
@@ -37,10 +24,10 @@ const Syllabus = () => {
         </Select>
         {open && (
           <Options>
-            {item.map((i) => (
+            {content.map((i) => (
               <Option>
                 <PiVideo fontSize={25} />
-                <span>{i.content}</span>
+                <span>{i.topic}</span>
               </Option>
             ))}
           </Options>

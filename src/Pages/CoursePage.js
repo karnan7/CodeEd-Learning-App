@@ -14,19 +14,22 @@ const CoursePage = () => {
   const courseList = useSelector((state) => state.course.courses);
 
   const fetchCourse = () => {
-    fetch("https://api.npoint.io/ffe04707e10bc4736d57")
+    fetch("https://api.npoint.io/4f8185583270d212694d")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         dispatch(
           setCourseData({
-            courses: data.courses,
+            courses: data.courses || [],
           })
-        );
-      });
+        )
+      })
+      .catch((error) => console.log(error))
   };
 
+  console.log(courseList)
+  
   useEffect(() => {
     fetchCourse();
   }, []);
@@ -61,7 +64,7 @@ const CoursePage = () => {
         <CourseGrp>
           {searchInput === ""
             ? courseList.map((course) => (
-                <Link to={`/details/` + course.id}>
+                <Link to={`/courses/details/` + course.id}>
                   <CourseCard
                     key={course.id}
                     title={course.name}
@@ -133,6 +136,7 @@ const CoursesContainer = styled.div`
 `;
 const CourseGrp = styled.div`
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-gap: 35px;
   @media (max-width: 1400px) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { SiCodenewbie } from "react-icons/si";
@@ -33,6 +33,7 @@ const Header = () => {
       navigate("/");
     });
   };
+
   return (
     <Nav>
       <Link to="/">
@@ -60,10 +61,11 @@ const Header = () => {
           {open && (
             <Dropdown>
               <h2>{userName ? `${userName}` : "Name"}</h2>
+              <Link to="/profile">
               <Item style={{ borderTop: "1px solid #22263b" }}>
                 <CgProfile fontSize={20} />
                 <span>My Profile</span>
-              </Item>
+              </Item></Link>
               <Item>
                 <IoMdNotifications fontSize={20} />
                 <span>Notifications</span>
